@@ -284,15 +284,12 @@ class block:
         #
         # no grouping, mutate every item on the stack once.
         #
-
         else:
             for item in self.stack:
                 if item.fuzzable and item.mutate():
                     mutated = True
-
                     if not isinstance(item, block):
-                        self.request.mutant = item
-
+						self.request.mutant = item
                     break
 
         # if this block is dependant on another field, then manually update that fields value appropriately while we
@@ -595,7 +592,7 @@ class repeat:
 
         # if a variable is specified, ensure it is an integer type.
         if self.variable and not isinstance(self.variable, primitives.bit_field):
-            print self.variable
+            print(self.variable)
             raise sex.SullyRuntimeError("ATTEMPT TO BIND THE REPEATER FOR BLOCK %s TO A NON INTEGER PRIMITIVE" % self.block_name)
 
         # if not binding variable was specified, propogate the fuzz library with the repetition counts.

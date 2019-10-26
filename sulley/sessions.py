@@ -817,7 +817,7 @@ class session (pgraph.graph):
                 self.logger.critical("SIGINT received ... exiting")
                 try:
                     self.thread.join()
-                except:
+                except: 
                     self.logger.debug( "No server launched")
 
                 sys.exit(0)

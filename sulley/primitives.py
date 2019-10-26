@@ -289,9 +289,7 @@ class random_data (base_primitive):
 
         @rtype:  Boolean
         @return: True on success, False otherwise.
-        '''
-
-        # if we've ran out of mutations, raise the completion flag.
+        if we've ran out of mutations, raise the completion flag.'''
         if self.mutant_index == self.num_mutations():
             self.fuzz_complete = True
 
