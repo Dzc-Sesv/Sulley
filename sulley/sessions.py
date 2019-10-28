@@ -172,6 +172,7 @@ class session (pgraph.graph):
         self.web_port            = web_port
         self.crash_threshold     = crash_threshold
         self.restart_sleep_time  = restart_sleep_time
+        self.PtaPath = []
 
         # Initialize logger
         self.logger = logging.getLogger("Sulley_logger")
@@ -358,6 +359,41 @@ class session (pgraph.graph):
 
 
     ####################################################################################################################
+    def setPtaPath(self,Path):
+        self.PtaPath.append(Path)
+    def getPtaPath(self):
+        return self.PtaPath
+    def PTA(self,SrcNode = None,DstNode = None,ReachedNodeIdList = [],Path = None):
+        AVFResult = self.AVF(SrcNode,ReachedNodeIdList)
+        if !AVFResult:
+            if SrcNode.name == DstNode.name:
+                Path += "->"+DstNode.name
+                self.setPtaPath(Path)
+                ReachedNodeIdList.append(SrcNode.id)
+                return
+            else:
+                ReachedNodeIdList.append(SrcNode.id)
+                return
+        else:
+            for item in AVFResult:
+                if item.name == DstNode.name:
+                    Path += "->"+item.name
+                    self.setPtaPath(Path)
+                    ReachedNodeIdList.append(item.id)
+                    return 
+                else:
+                    Path += "->"+item.name
+                    self.PTA(item,DstNode,ReachedNodeIdList.append(item.id),Path)
+            return 
+    def AVF(self,Current_node = None,ReachedNodeIdList):
+        EdgeFromCurrentNodeList = self.edges_from(Current_Node.id)
+        AvailableNodeId = None
+        for edge in EdgeFromCurrentNodeList:
+            if edge.dst.id in ReachedNodeIdList:
+                continue
+            else:
+                AvailableNodeId.append(edge.dst)
+        return AvailableNodeId    
     def fuzz (self, this_node=None, path=[]):
         '''
         Call this routine to get the ball rolling. No arguments are necessary as they are both utilized internally
@@ -805,7 +841,7 @@ class session (pgraph.graph):
         # add a signal handler, and exit on SIGINT
         # TODO: should wait for the end of the ongoing test case, and stop gracefully netmon and procmon
         # TODO: doesn't work on OS where the signal module isn't available
-        try:
+        try:            
             import signal
             self.signal_module = True
         except:
