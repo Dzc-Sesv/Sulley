@@ -16,7 +16,7 @@ import pedrpc
 import pgraph
 import sex
 import primitives
-
+import numpy
 
 ########################################################################################################################
 class target:
@@ -172,8 +172,11 @@ class session (pgraph.graph):
         self.web_port            = web_port
         self.crash_threshold     = crash_threshold
         self.restart_sleep_time  = restart_sleep_time
+
         self.PtaPath = []
         self.ReachedNodeIdList = []
+        self.MaxPtaPathLength = 0
+        self.AcpMatrix = None
 
         # Initialize logger
         self.logger = logging.getLogger("Sulley_logger")
@@ -359,7 +362,38 @@ class session (pgraph.graph):
         fh.close()
 
 
-    ####################################################################################################################
+    #######################################
+    #############################################################################
+    def GeneratingAcpMatrix(self):
+        self.MaxPtaPathLength = 0
+        if not self.PtaPath:
+            pass
+        Mindex = -1
+
+        for index,item in enumerate(self.PtaPath):
+            if len(item) > self.MaxPtaPathLength:
+                self.MaxPtaPathLength = len(item)
+                Mindex = index
+
+        count = 1
+        for i in range(len(self.PtaPath[Mindex])-1):  
+            if self.PtaPath[Mindex][i:i+len("->")] == "->":
+                count += 1
+
+        assert(count > 0)
+        self.AcpMatrix = numpy.zeros((count,len(self.PtaPath)))
+
+        for index,item in enumerate(self.PtaPath):
+            item = item.split("->")
+            for i in range(len(item)-1):
+                self.AcpMatrix[i][index] = self.find_node("name",item[i]).id
+        item = self.PtaPath[Mindex].split("->")
+        self.AcpMatrix[count-1] = self.find_node("name",item[len(item)-1]).id
+
+
+
+        #for i in  xrange():
+        
     def setPtaPath(self,Path):
         self.PtaPath.append(Path)
     def getPtaPath(self):
