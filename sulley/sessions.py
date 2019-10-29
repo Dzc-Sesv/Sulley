@@ -173,6 +173,7 @@ class session (pgraph.graph):
         self.crash_threshold     = crash_threshold
         self.restart_sleep_time  = restart_sleep_time
         self.PtaPath = []
+        self.ReachedNodeIdList = []
 
         # Initialize logger
         self.logger = logging.getLogger("Sulley_logger")
@@ -363,33 +364,34 @@ class session (pgraph.graph):
         self.PtaPath.append(Path)
     def getPtaPath(self):
         return self.PtaPath
-    def PTA(self,SrcNode = None,DstNode = None,ReachedNodeIdList = [],Path = None):
-        AVFResult = self.AVF(SrcNode,ReachedNodeIdList)
-        if !AVFResult:
+    def PTA(self,SrcNode ,DstNode,Path):
+        AVFResult = self.AVF(SrcNode)
+        if not AVFResult:
             if SrcNode.name == DstNode.name:
                 Path += "->"+DstNode.name
                 self.setPtaPath(Path)
-                ReachedNodeIdList.append(SrcNode.id)
                 return
             else:
-                ReachedNodeIdList.append(SrcNode.id)
+                self.ReachedNodeIdList.append(SrcNode.id)
                 return
         else:
             for item in AVFResult:
-                if item.name == DstNode.name:
-                    Path += "->"+item.name
+                if self.find_node("id",item).name == DstNode.name:
+                    Path += "->"+self.find_node("id",item).name
                     self.setPtaPath(Path)
-                    ReachedNodeIdList.append(item.id)
                     return 
                 else:
-                    Path += "->"+item.name
-                    self.PTA(item,DstNode,ReachedNodeIdList.append(item.id),Path)
+                    tempPath = Path
+                    Path += "->" + self.find_node("id",item).name
+                    print  self.find_node("id",item).name
+                    self.PTA(self.find_node("id",item),DstNode,Path)
+                    Path =tempPath
             return 
-    def AVF(self,Current_node = None,ReachedNodeIdList):
-        EdgeFromCurrentNodeList = self.edges_from(Current_Node.id)
-        AvailableNodeId = None
+    def AVF(self,Current_node = None):
+        EdgeFromCurrentNodeList = self.edges_from(Current_node.id)
+        AvailableNodeId = []
         for edge in EdgeFromCurrentNodeList:
-            if edge.dst.id in ReachedNodeIdList:
+            if edge.dst in self.ReachedNodeIdList:
                 continue
             else:
                 AvailableNodeId.append(edge.dst)
