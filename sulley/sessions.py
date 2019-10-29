@@ -383,7 +383,6 @@ class session (pgraph.graph):
                 else:
                     tempPath = Path
                     Path += "->" + self.find_node("id",item).name
-                    print  self.find_node("id",item).name
                     self.PTA(self.find_node("id",item),DstNode,Path)
                     Path =tempPath
             return 
