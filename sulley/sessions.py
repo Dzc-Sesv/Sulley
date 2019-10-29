@@ -177,6 +177,8 @@ class session (pgraph.graph):
         self.ReachedNodeIdList = []
         self.MaxPtaPathLength = 0
         self.AcpMatrix = None
+        self.Ps = None
+        self.Cp = None
 
         # Initialize logger
         self.logger = logging.getLogger("Sulley_logger")
@@ -364,10 +366,20 @@ class session (pgraph.graph):
 
     #######################################
     #############################################################################
+    def initPs(self):
+        if not self.Ps:
+            raise sex.SullyRuntimeError("Ps还未生成")
+        else:
+            pass
+    def GenerateingCpMatrix(self):
+        if not self.AcpMatrix or not self.Ps:
+            raise sex.SullyRuntimeError("Ps或AcpMatrix未生成")
+        else:
+            self.Cp = numpy.matmul(self.AcpMatrix,self.Ps)
     def GeneratingAcpMatrix(self):
         self.MaxPtaPathLength = 0
         if not self.PtaPath:
-            pass
+            raise sex.SullyRuntimeError("PtaPath未生成")
         Mindex = -1
 
         for index,item in enumerate(self.PtaPath):
@@ -382,6 +394,8 @@ class session (pgraph.graph):
 
         assert(count > 0)
         self.AcpMatrix = numpy.zeros((count,len(self.PtaPath)))
+        self.Ps = numpy.zeros((len(self.PtaPath),count))
+        self.Cp = numpy.zeros((count,count))
 
         for index,item in enumerate(self.PtaPath):
             item = item.split("->")
@@ -391,8 +405,6 @@ class session (pgraph.graph):
         self.AcpMatrix[count-1] = self.find_node("name",item[len(item)-1]).id
 
 
-
-        #for i in  xrange():
         
     def setPtaPath(self,Path):
         self.PtaPath.append(Path)
@@ -429,6 +441,12 @@ class session (pgraph.graph):
             else:
                 AvailableNodeId.append(edge.dst)
         return AvailableNodeId    
+
+
+
+
+
+
     def fuzz (self, this_node=None, path=[]):
         '''
         Call this routine to get the ball rolling. No arguments are necessary as they are both utilized internally
